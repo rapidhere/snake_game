@@ -28,6 +28,8 @@ class Snake:
         self.body = [head_pos,(head_pos[0] + 1,head_pos[1]),(head_pos[0] + 2,head_pos[1])]
         self.dir = DIR_LF
 
+        self.eat_rest = 0
+
     def get_length(self):
         return len(self.body)
 
@@ -60,13 +62,19 @@ class Snake:
 
     def eat(self,food_pos):
         head = self.body[0]
+        flag = False
         if head == food_pos:
+            flag = True
+            self.eat_rest += 5
+
+        if self.eat_rest:
             tail = self.body[-1]
             stail = self.body[-2]
             last_dir = (tail[0] - stail[0],tail[1] - stail[1])
             self.body.append((tail[0] + last_dir[0],tail[1] + last_dir[1]))
-            return True
-        return False
+            self.eat_rest -= 1
+
+        return flag
 
 if __name__ == "__main__":
     sk = Snake((10,10))

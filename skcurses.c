@@ -30,6 +30,8 @@ const int SKCUR_COLORS[][3] = {
     {-1,-1,-1}
 };
 
+static WINDOW * workwin = NULL;
+
 int skcur_init(void)
 {
     int i;
@@ -53,6 +55,12 @@ int skcur_init(void)
             break;
         init_pair(col_nm,col_fg,col_bg);
     }
+    
+    workwin = subwin(stdscr,LINES - 1,COLS,1,0);
+    if(!workwin) {
+        return SKCUR_ERR_INIT_FAIL;
+    }
+    box(workwin,ACS_VLINE,ACS_HLINE);
     return SKCUR_SUCCESS;
 }
 
@@ -84,19 +92,21 @@ int skcur_write_score(int score)
 int skcur_draw_point(int y,int x,short int color)
 {
     attron(COLOR_PAIR(color));
-    mvprintw(y + 1,x,"%c",POINT_CHR);
+    mvwprintw(workwin,y + 1,x + 1,"%c",POINT_CHR);
     attroff(COLOR_PAIR(color));
     return SKCUR_SUCCESS;
 }
 
 int skcur_erase_point(int y,int x)
 {
-    mvprintw(y + 1,x," ");
+    mvwprintw(workwin,y + 1,x + 1," ");
     return SKCUR_SUCCESS;
 }
 
 int skcur_refresh(void)
 {
+    if(touchwin(stdscr) != OK)
+        return SKCUR_ERR_REFRESH_FAIL;
     if(move(0,0) != OK)
         return SKCUR_ERR_REFRESH_FAIL;
     if(refresh() != OK)
@@ -111,13 +121,13 @@ int skcur_getch(int * ch)
 }
 int skcur_get_scr_width(int * ret)
 {
-    *ret = getmaxx(stdscr);
+    *ret = getmaxx(workwin) - 2;
     return SKCUR_SUCCESS;
 }
 
 int skcur_get_scr_height(int * ret)
 {
-    *ret = getmaxy(stdscr) - 1;
+    *ret = getmaxy(workwin) - 2;
     return SKCUR_SUCCESS;
 }
 

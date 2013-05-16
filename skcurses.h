@@ -37,7 +37,7 @@
 #define INFO_POS 20
 #define SCO_POS 3
 
-#define POINT_CHR '#'
+#define POINT_CHR 'o'
 
 int skcur_init(void);
 int skcur_write_info(const char * info);
