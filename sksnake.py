@@ -18,10 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
+import skerr
+
 DIR_RG = (1,0)
 DIR_LF = (-1,0)
 DIR_UP = (0,-1)
 DIR_DW = (0,1)
+DIRS = (DIR_RG,DIR_LF,DIR_UP,DIR_DW)
 
 class Snake:
     def __init__(self,head_pos):
@@ -34,9 +38,12 @@ class Snake:
         return len(self.body)
 
     def get_body(self):
-        return self.body
+        return copy.deepcopy(self.body)
 
     def set_dir(self,direction):
+        if not direction in DIRS:
+            raise skerr.SKSnakeWrongDirection()
+
         if ((direction == DIR_RG and self.dir == DIR_LF) or
             (direction == DIR_LF and self.dir == DIR_RG) or
             (direction == DIR_UP and self.dir == DIR_DW) or
@@ -44,7 +51,10 @@ class Snake:
             return
         self.dir = direction
 
-    def get_dir(self): return self.dir
+    def get_dir(self):
+        if not self.dir in DIRS:
+            raise skerr.SKSnakeWrongDirection()
+        return self.dir
 
     def move(self):
         head = self.body[0]
@@ -60,21 +70,22 @@ class Snake:
     def is_cut_self(self):
         return self.body[0] in self.body[1:]
 
-    def eat(self,food_pos):
+    def eat(self,food_pos,add_length = 5):
         head = self.body[0]
         flag = False
         if head == food_pos:
             flag = True
-            self.eat_rest += 5
+            self.eat_rest += add_length
 
+        return flag
+
+    def digest(self):
         if self.eat_rest:
             tail = self.body[-1]
             stail = self.body[-2]
             last_dir = (tail[0] - stail[0],tail[1] - stail[1])
             self.body.append((tail[0] + last_dir[0],tail[1] + last_dir[1]))
             self.eat_rest -= 1
-
-        return flag
 
 if __name__ == "__main__":
     sk = Snake((10,10))
