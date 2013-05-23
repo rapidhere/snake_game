@@ -44,23 +44,27 @@ class SKSetting:
             raise skerr.SettingFileNotFound(setting_file)
         try:
             root = ElementTree.parse(setting_file).getroot()
-            self.build_settings(self,root)
-        except Exception,e:
-            raise skerr.LoadSettingFail(str(e))
+            self.build_settings(self,root,skenv.SettingTree["settings"])
+        except skerr.LoadSettingFail:
+            raise
 
-    def build_settings(self,father,ele):
+    def build_settings(self,father,ele,set_tree):
         chlist = ele.getchildren()
         cur = None
         if not chlist:
             attrs = ele.attrib
+            if sorted(attrs.keys()) != sorted(set_tree):
+                raise skerr.WrongSettingSyntax()
             cur = SKSetting.SettingContainer(attrs.keys())
             for key in attrs:
                 setattr(cur,key,attrs[key])
         else:
             taglist = [x.tag for x in chlist]
+            if sorted(taglist) != sorted(set_tree.keys()):
+                raise skerr.WrongSettingSyntax()
             cur = SKSetting.SettingContainer(taglist)
             for ch in chlist:
-                self.build_settings(cur,ch)
+                self.build_settings(cur,ch,set_tree[ch.tag])
         setattr(father,ele.tag,cur)
 
     def __getattr__(self,attr):

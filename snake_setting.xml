@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <settings>
-    <app> </app>
+    <app>
+        <size height="22" width="80"/>
+    </app>
     <game>
         <level>
             <lv1 interval="0.25" add_length="1"/>

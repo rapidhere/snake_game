@@ -27,6 +27,10 @@ class SKAppScreenError(SnakeError):
     def __init__(self,info):
         SnakeError.__init__(self,info)
 
+class SKAppScreenTooSmall(SnakeError):
+    def __init__(self):
+        SKAppScreenError.__init__(self,"Screen is too small!")
+
 # } Snake Error {
 class SKSnakeError(SnakeError):
     def __init__(self,info): SnakeError.__init(self,info)
@@ -51,4 +55,7 @@ class WrongSetting(SKSettingError):
     def __init__(self,attr):
         SKSettingError.__init__(self,"Wrong setting name : %s" % attr)
 
+class WrongSettingSyntax(LoadSettingFail):
+    def __init__(self):
+        LoadSettingFail.__init__(self,"Wrong setting file syntax!")
 # }

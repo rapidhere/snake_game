@@ -100,17 +100,18 @@ class SKGame:
 
             ch = self.input_handler()
             if ch != -1:
-                ch = chr(ch)
-            if ch == 'w' or ch == 'W':
-                self.snake.set_dir(sksnake.DIR_UP)
-            elif ch == 'a' or ch == 'A':
-                self.snake.set_dir(sksnake.DIR_LF)
-            elif ch == 's' or ch == 'S':
-                self.snake.set_dir(sksnake.DIR_DW)
-            elif ch == 'd' or ch == 'D':
-                self.snake.set_dir(sksnake.DIR_RG)
-            elif ch == 'q' or ch == 'Q':
-                break
+                if ch < 256:
+                    ch = chr(ch)
+                if ch == 'w' or ch == 'W' or ch == curses.KEY_UP:
+                    self.snake.set_dir(sksnake.DIR_UP)
+                elif ch == 'a' or ch == 'A' or ch == curses.KEY_LEFT:
+                    self.snake.set_dir(sksnake.DIR_LF)
+                elif ch == 's' or ch == 'S' or ch == curses.KEY_DOWN:
+                    self.snake.set_dir(sksnake.DIR_DW)
+                elif ch == 'd' or ch == 'D' or ch == curses.KEY_RIGHT:
+                    self.snake.set_dir(sksnake.DIR_RG)
+                elif ch == 'q' or ch == 'Q':
+                    break
 
             last = self.snake.move()
             self.screen.erase_point(last[1],last[0])

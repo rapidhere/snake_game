@@ -31,8 +31,14 @@ import random
 import curses
 
 class AppScreen:
-    def __init__(self):
-        self.stdscr = curses.initscr()
+    def __init__(self,min_height,min_width):
+        scr = curses.initscr()
+        scr_size = scr.getmaxyx()
+        if scr_size[0] < min_height or scr_size[1] < min_width:
+            raise skerr.SKAppScreenTooSmall()
+        self.stdscr = curses.newwin(min_height,min_width,0,0)
+        self.menuscr = self.stdscr.subwin(min_height - 2,min_width - 2,1,1)
+
         curses.noecho()
         curses.cbreak()
         self.stdscr.keypad(1)
@@ -52,18 +58,21 @@ class AppScreen:
 
     def main_menu(self,menu_list,cutoffs,cur_level):
         self.stdscr.clear()
+        self.stdscr.box()
         self.stdscr.refresh()
-        size = self.stdscr.getmaxyx()
+
+        size = self.menuscr.getmaxyx()
+
         cur_idx = 0
 
         title = "Eating Snake - Main Menu"
-        self.stdscr.addstr(0,(size[1] - len(title)) / 2,title,curses.A_BOLD)
+        self.stdscr.addstr(0,(size[1] + 2 - len(title)) / 2,title,curses.A_BOLD)
 
         level_buf = "Current Level : %s" % cur_level
-        self.stdscr.addstr(size[0] - 1,size[1] - len(level_buf) - 2,level_buf)
-        self.stdscr.addstr(size[0] - 2,1,"version %s" % skenv.version)
-        self.stdscr.addstr(size[0] - 1,1,"rapidhere@gmail.com")
-        self.stdscr.refresh()
+        self.menuscr.addstr(size[0] - 1,size[1] - len(level_buf) - 2,level_buf)
+        self.menuscr.addstr(size[0] - 2,1,"version %s" % skenv.version)
+        self.menuscr.addstr(size[0] - 1,1,"rapidhere@gmail.com")
+        self.menuscr.refresh()
 
         while True:
             self._show_menu(menu_list,cutoffs,cur_idx,(size[1] - len(title)) / 2)
@@ -80,17 +89,18 @@ class AppScreen:
                 pass # ignored
 
     def _show_menu(self,menu_list,cutoffs,curidx,start_x):
-        size = self.stdscr.getmaxyx()
+        size = self.menuscr.getmaxyx()
         start_y = (size[0] - len(menu_list)) / 2
-        self.stdscr.addstr(start_y - 2,start_x,"Options:")
+        self.menuscr.addstr(start_y - 2,start_x,"Options:")
         for i in range(0,len(menu_list)):
             y =  start_y + i
             buf = "[%s] %s" % (cutoffs[i],menu_list[i])
             x = start_x
             if i == curidx:
-                self.stdscr.addstr(y,x,buf,curses.A_STANDOUT)
+                self.menuscr.addstr(y,x,buf,curses.A_STANDOUT)
             else:
-                self.stdscr.addstr(y,x,buf)
+                self.menuscr.addstr(y,x,buf)
+        self.stdscr.touchwin()
         self.stdscr.refresh()
 
     def choose_level(self,max_lv):
@@ -100,7 +110,7 @@ class AppScreen:
         tip = "Please enter a level(1~%d):" % max_lv
         width = len(tip) + 5
         try:
-            size = self.stdscr.getmaxyx()
+            size = self.menuscr.getmaxyx()
             chwin = curses.newwin(3,width,(size[0] - 3) / 2,(size[1] - width) / 2)
             chwin.box(ord('|'),ord('-'))
             chwin.addstr(1,1,tip)
@@ -124,8 +134,11 @@ class AppScreen:
 class SKApp:
     def __init__(self):
         random.seed(time.time())
-        self.screen = AppScreen()
         self.setting = sksetting.SKSetting()
+        self.screen = AppScreen(
+            int(self.setting.app.size.height),
+            int(self.setting.app.size.width),
+        )
 
     def get_input(self):
         return self.screen.getch()
@@ -143,6 +156,7 @@ class SKApp:
         level = 1
         while True:
             idx = self.screen.main_menu(MenuItems,Cuttoffs,"lv%d" % level)
+
             if idx == 0:
                 self.run_game(level)
             elif idx == 1:
