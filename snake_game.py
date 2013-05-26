@@ -39,10 +39,10 @@ opts,args = parser.parse_args()
 parser.destroy()
 
 if opts.key_help:
-    print "'w' or 'W'    up"
-    print "'a' or 'A'    left"
-    print "'s' or 'S'    down"
-    print "'d' or 'D'    right"
+    print "'w' or 'W' or UP-Arrow   up"
+    print "'a' or 'A' or LF-Arrow   left"
+    print "'s' or 'S' or DW-Arrow   down"
+    print "'d' or 'D' or RG-Arrpw   right"
     print "'q' or 'Q'    quit"
     sys.exit(0)
 

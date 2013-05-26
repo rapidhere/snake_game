@@ -22,6 +22,7 @@ import skgame
 import skerr
 import sksetting
 import skenv
+import skscore
 
 import os
 import fcntl
@@ -124,6 +125,26 @@ class AppScreen:
             curses.noecho()
             curses.cbreak()
 
+    def show_high_scores(self,score_list):
+        self.stdscr.clear()
+        self.stdscr.box()
+        self.stdscr.refresh()
+
+        size = self.stdscr.getmaxyx()
+
+        title = "High Scores"
+        self.stdscr.addstr(0,(size[1] - len(title)) / 2,title,curses.A_BOLD)
+
+        start_y = 6
+        start_x = (size[1] - len(title)) / 2
+
+        rank = 1
+        for rec in score_list:
+            self.stdscr.addstr(start_y + rank - 1,start_x,"%d.  %d" % (rank,rec))
+            rank += 1
+
+        self.getch()
+
     def getch(self):
         return self.stdscr.getch()
 
@@ -139,6 +160,7 @@ class SKApp:
             int(self.setting.app.size.height),
             int(self.setting.app.size.width),
         )
+        self.score_rec = skscore.SKScore()
 
     def get_input(self):
         return self.screen.getch()
@@ -146,13 +168,11 @@ class SKApp:
     def run(self):
         MenuItems = (
             "New Game",
-            "Load Game",
             "Choose Level",
             "High Scores",
-            "Help",
             "Quit"
         )
-        Cuttoffs = ("N","L","C","H","E","Q")
+        Cuttoffs = ("N","C","E","Q")
         level = 1
         while True:
             idx = self.screen.main_menu(MenuItems,Cuttoffs,"lv%d" % level)
@@ -160,17 +180,13 @@ class SKApp:
             if idx == 0:
                 self.run_game(level)
             elif idx == 1:
-                pass
-            elif idx == 2:
                 maxlv = len(self.setting.game.level)
                 level = self.screen.choose_level(maxlv)
                 if level < 1: level = 1
                 if level > maxlv: level = maxlv
+            elif idx == 2:
+                self.screen.show_high_scores(self.score_rec)
             elif idx == 3:
-                pass
-            elif idx == 4:
-                pass
-            elif idx == 5:
                 break
 
     def run_game(self,levelno):
@@ -180,7 +196,8 @@ class SKApp:
             lv = "lv%d" % levelno
             lv = getattr(self.setting.game.level,lv)
             game = skgame.SKGame(self.screen,self.get_input,float(lv.interval),int(lv.add_length))
-            game.run()
+            score = game.run()
+            self.score_rec.update_rec(score)
         finally:
             fcntl.fcntl(0,fcntl.F_SETFL,flag)
 

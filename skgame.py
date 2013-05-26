@@ -54,7 +54,7 @@ class SKGameScreen:
         self.last_info_len = len(string)
 
     def write_score(self,score):
-        self.scr.addstr(0,3,str(score),self.COL_SCORE)
+        self.scr.addstr(0,3,"Score : " + str(score),self.COL_SCORE)
 
     def draw_point(self,y,x):
         self.workwin.addstr(y + 1,x + 1,self.snake_ch,self.COL_SNAKE)
@@ -91,7 +91,6 @@ class SKGame:
         return random.choice(_ran_list)
 
     def run(self):
-        self.screen.write_info("Hello")
         win_size = self.screen.get_size()
         food = self._rand_food()
 
@@ -133,3 +132,5 @@ class SKGame:
 
             self.screen.refresh()
             time.sleep(self.interval)
+
+        return self.snake.get_length()
