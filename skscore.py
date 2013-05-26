@@ -38,7 +38,8 @@ class SKScore:
         if len(self.score_list) > MAX_SCORE_CNT:
             self.score_list = self.score_list[:-1]
 
-    def __iter__(self): return iter(self.score_list)
+    def __iter__(self):
+        return iter(self.score_list)
 
     def __del__(self):
         import skenv

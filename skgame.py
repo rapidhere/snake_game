@@ -54,7 +54,7 @@ class SKGameScreen:
         self.last_info_len = len(string)
 
     def write_score(self,score):
-        self.scr.addstr(0,3,"Score : " + str(score),self.COL_SCORE)
+        self.scr.addstr(0,3,"Score : %s" % score,self.COL_SCORE)
 
     def draw_point(self,y,x):
         self.workwin.addstr(y + 1,x + 1,self.snake_ch,self.COL_SNAKE)

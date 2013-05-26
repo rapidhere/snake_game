@@ -200,7 +200,3 @@ class SKApp:
             self.score_rec.update_rec(score)
         finally:
             fcntl.fcntl(0,fcntl.F_SETFL,flag)
-
-if __name__ == "__main__":
-    app = SKApp()
-    app.run()

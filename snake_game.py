@@ -45,6 +45,6 @@ if opts.key_help:
     print "'d' or 'D' or RG-Arrpw   right"
     print "'q' or 'Q'    quit"
     sys.exit(0)
-
-app = skapp.SKApp()
-app.run()
+else:
+    app = skapp.SKApp()
+    app.run()
